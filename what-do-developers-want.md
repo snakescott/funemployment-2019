@@ -2,7 +2,7 @@ On Twitter and Slack, I asked:
 
 > If developer's aren't complaining about CI/CD, monitoring/alerting/paging, observability, or feature flags, what other DevOps stuff are they complaining about next?
 
-Got lots of interesting answers including
+The exclusions are there because those items seem like clearly (to me!) part of forward-looking DevOps implementations. I recieved lots of interesting answers (unsorted/raw at the moment). Asking questions which elicit interesting answers is fun!
 
 * Security
 * Prioritization of the fixes for those
