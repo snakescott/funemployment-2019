@@ -44,3 +44,5 @@ def extract_outage_links(text):
     return filter(None, outage_links)
 
 
+
+

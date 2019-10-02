@@ -352,11 +352,11 @@ Finally, we know that you depend on Google Cloud Platform for your production wo
 
 # [appengine/17005](https://status.cloud.google.com/incident/appengine/17005)
 10:07 Jun 13, 2017
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 On Wednesday 7 June 2017, Google App Engine experienced highly elevated serving latency and timeouts for a duration of 138 minutes. If your service or application was affected the increase in latency, we sincerely apologize â this is not the level of reliability and performance we expect of our platform, and we are taking immediate steps to improve the platformâs performance and availability.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 On Wednesday 7 June 2017, from 13:34 PDT to 15:52 PDT, 7.7% of active applications on the Google App Engine service experienced severely elevated latency; requests that typically take under 500ms to serve were taking many minutes. This elevated latency would have either resulted in users seeing additional latency when waiting for responses from the affected applications or 500 errors if the application handlers timed out.  The individual application logs would have shown this increased latency or increases in âRequest was aborted after waiting too long to attempt to service your requestâ error messages.
-## ROOT CAUSE
+## ROOT CAUSE:
 The incident was triggered by an increase in memory usage across all App Engine appservers in a datacenter in us-central.  An App Engine appserver is responsible for creating instances to service requests for App Engine applications. When its memory usage increases to unsustainable levels, it will stop some of its current instances, so that they can be rescheduled on other appservers in order to balance out the memory requirements across the datacenter.  This transfer of an App Engine instance between appservers consumes CPU resources, a signal used by the master scheduler of the datacenter to detect when it must further rebalance traffic across more appservers (such as when traffic to the datacenter increases and more App Engine instances are required).
 Normally, these memory management techniques are transparent to customers but in isolated cases, they can be exacerbated by large amounts of additional traffic being routed to the datacenter, which requires more instances to service user requests.  The increased load and memory requirement from scheduling new instances combined with rescheduling instances from appservers with high memory usage resulted in most appservers being considered âbusyâ by the master scheduler.  User requests needed to wait for an available instance to either be transferred or created before they were able to be serviced, which results in the increased latency seen at the app level.
 REMEDIATION AND PREVENTION
@@ -365,13 +365,13 @@ To prevent future recurrence of this issue, Google engineers will be re-evaluati
 
 # [appengine/17006](https://status.cloud.google.com/incident/appengine/17006)
 07:17 Jun 17, 2017
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 On Thursday 8 June 2017, from 08:24 to 09:26 US/Pacific Time, datacenters in the asia-northeast1 region experienced a loss of network connectivity for a total of 62 minutes. We apologize for the impact this issue had on our customers, and especially to those customers with deployments across multiple zones in the asia-northeast1 region. We recognize we failed to deliver the regional reliability that multiple zones are meant to achieve.
 We recognize the severity of this incident and have completed an extensive internal postmortem.  We thoroughly understand the root causes and no datacenters are at risk of recurrence.  We are at work to add mechanisms to prevent and mitigate this class of problem in the future.  We have prioritized this work and in the coming weeks, our engineering team will complete the action items we have generated from the postmortem.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 On Thursday 8 June 2017, from 08:24 to 09:26 US/Pacific Time, network connectivity to and from Google Cloud services running in the asia-northeast1 region was unavailable for 62 minutes.  This issue affected all Google Cloud Platform services in that region, including Compute Engine, App Engine, Cloud SQL, Cloud Datastore, and Cloud Storage.  All external connectivity to the region was affected during this time frame, while internal connectivity within the region was not affected.
 In addition, inbound requests from external customers originating near Googleâs Tokyo point of presence intended for Compute or Container Engine HTTP Load Balancing were lost for the initial 12 minutes of the outage. Separately, Internal Load Balancing within asia-northeast1 remained degraded until 10:23.
-## ROOT CAUSE
+## ROOT CAUSE:
 At the time of incident, Google engineers were upgrading the network topology and capacity of the region; a configuration error caused the existing links to be decommissioned before the replacement links could provide connectivity, resulting in a loss of connectivity for the asia-northeast1 region. Although the replacement links were already commissioned and appeared to be ready to serve, a network-routing protocol misconfiguration meant that the routes through those links were not able to carry traffic.
 As Google's global network grows continuously, we make upgrades and updates reliably by using automation for each step and, where possible, applying changes to only one zone at any time.  The topology in asia-northeast1 was the last region unsupported by automation; manual work was required to be performed to align its topology with the rest of our regional deployments (which would, in turn, allow automation to function properly in the future). This manual change mistakenly did not follow the same per-zone restrictions as required by standard policy or automation, which meant the entire region was affected simultaneously.
 In addition, some customers with deployments across multiple regions that included asia-northeast1 experienced problems with HTTP Load Balancing due to a failure to detect that the backends were unhealthy. When a network partition occurs, HTTP Load Balancing normally detects this automatically within a few seconds and routes traffic to backends in other regions. In this instance, due to a performance feature being tested in this region at the time, the mechanism that usually detects network partitions did not trigger, and continued to attempt to assign traffic until our on-call engineers responded.  Lastly, the Internal Load Balancing outage was exacerbated due to a software defined networking component which was stuck in a state where it was not able to provide network resolution for instances in the load balancing group.
@@ -382,21 +382,21 @@ The fix for the HTTP Load Balancing performance feature that caused it to incorr
 SUPPORT COMMUNICATIONS
 During the incident, customers who had originally contacted Google Cloud Support in Japanese did not receive periodic updates from Google as the event unfolded. This was due to a software defect in the support tooling â unrelated to the incident described earlier.
 We have already fixed the software defect, so all customers who contact support will receive incident updates.  We apologize for the communications gap to our Japanese-language customers.
-RELIABILITY ## SUMMARY
+RELIABILITY SUMMARY
 One of our biggest pushes in GCP reliability at Google is a focus on careful isolation of zones from each other.  As we encourage users to build reliable services using multiple zones, we also treat zones separately in our production practices, and we enforce this isolation with software and policy.  Since we missed this markâand affecting all zones in a region is an especially serious outageâwe apologize.  We intend for this incident report to accurately summarize the detailed internal post-mortem that includes final assessment of impact, root cause, and steps we are taking to prevent an outage of this form occurring again.  We hope that this incident report demonstrates the work we do to learn from our mistakes to deliver on this commitment. We will do better.
 Sincerely,
 Benjamin Lutch | VP Site Reliability Engineering | Google
 
 # [appengine/17007](https://status.cloud.google.com/incident/appengine/17007)
 10:59 Nov 07, 2017
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 On Monday 6 November 2017, the App Engine Memcache service experienced unavailability for applications in all regions for 1 hour and 50 minutes.
 We sincerely apologize for the impact of this incident on your application or service. We recognize the severity of this incident and will be undertaking a detailed review to fully understand the ways in which we must change our systems to prevent a recurrence.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 On Monday 6 November 2017 from 12:33 to 14:23 PST, the App Engine Memcache service experienced unavailability for applications in all regions.
 Some customers experienced elevated Datastore latency and errors while Memcache was unavailable. At this time, we believe that all the Datastore issues were caused by surges of Datastore activity due to Memcache being unavailable. When Memcache failed, if an application sent a surge of Datastore operations to specific entities or key ranges, then Datastore may have experienced contention or hotspotting, as described in https://cloud.google.com/datastore/docs/best-practices#designing_for_scale. Datastore experienced elevated load on its servers when the outage ended due to a surge in traffic. Some applications in the US experienced elevated latency on gets between 14:23 and 14:31, and elevated latency on puts between 14:23 and 15:04.
 Customers running Managed VMs experienced failures of all HTTP requests and App Engine API calls during this incident. Customers using App Engine Flexible Environment, which is the successor to Managed VMs, were not impacted.
-## ROOT CAUSE
+## ROOT CAUSE:
 The App Engine Memcache service requires a globally consistent view of the current serving datacenter for each application in order to guarantee strong consistency when traffic fails over to alternate datacenters. The configuration which maps applications to datacenters is stored in a global database.
 The incident occurred when the specific database entity that holds the configuration became unavailable for both reads and writes following a configuration update. App Engine Memcache is designed in such a way that the configuration is considered invalid if it cannot be refreshed within 20 seconds. When the configuration could not be fetched by clients, Memcache became unavailable.
 REMEDIATION AND PREVENTION
@@ -405,15 +405,15 @@ As a temporary mitigation, we have reduced the number of readers of the global c
 
 # [appengine/19001](https://status.cloud.google.com/incident/appengine/19001)
 17:25 Jan 07, 2019
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 On Wednesday 2 January, 2019, application creation in Google App Engine (App Engine), first-time deployment of Google Cloud Functions (Cloud Functions) per region, and project creation & API management in Cloud Console experienced elevated error rates ranging from 71% to 100% for a duration of 3 hours, 40 minutes starting at 14:40 PST. Workloads already running on App Engine and Cloud Functions, including deployment of new versions of applications and functions, as well as ongoing use of existing projects and activated APIs, were not impacted.
 We know that many customers depend on the ability to create new Cloud projects, applications & functions, and apologize for our failure to provide this to you during this time. The root cause of the incident is fully understood and engineering efforts are underway to ensure the issue is not at risk of recurrence.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 On Wednesday 2 January, 2019 from 14:40 PST to 18:20 PST, application creation in App Engine, first-time deployments of Cloud Functions, and project creation & API auto-enablement in Cloud Console experienced elevated error rates in all regions due to a recently deployed configuration update to the underlying control plane for all impacted services.
 First-time deployments of new Cloud Functions failed. Redeploying existing deployments of Cloud Functions were not impacted. Workloads on already deployed Cloud Functions were not impacted.
 App Engine app creation experienced an error rate of 98%. Workloads for deployed App Engine applications were not impacted.
 Cloud API enable requests experienced a 97% average error rate while disable requests had a 71% average error rate. Affected users observed these errors when attempting to enable an API via the Cloud Console and API Console.
-## ROOT CAUSE
+## ROOT CAUSE:
 The control plane responsible for managing new app creations in App Engine, new function deployments in Cloud Functions, project creation & API management in Cloud Console utilizes a metadata store. This metadata store is responsible for persisting and processing new project creations, function deployments, App Engine applications, and API enablements.
 Google engineers began rolling out a new feature designed to improve the fault-tolerance of the metadata store. The rollout had been successful in test environments, but triggered an issue in production due to an unexpected difference in configuration, which triggered a bug. The bug caused writes to the metadata store to fail.
 REMEDIATION AND PREVENTION
@@ -424,15 +424,15 @@ To improve time to resolution for such issues, we are increasing the robustness 
 
 # [appengine/19007](https://status.cloud.google.com/incident/appengine/19007)
 11:11 Mar 14, 2019
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 On Tuesday 12 March 2019, Google's internal blob storage service experienced a service disruption for a duration of 4 hours and 10 minutes. We apologize to customers whose service or application was impacted by this incident. We know that our customers depend on Google Cloud Platform services and we are taking immediate steps to improve our availability and prevent outages of this type from recurring.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 On Tuesday 12 March 2019 from 18:40 to 22:50 PDT, Google's internal blob (large data object) storage service experienced elevated error rates, averaging 20% error rates with a short peak of 31% errors during the incident. User-visible Google services including Gmail, Photos, and Google Drive, which make use of the blob storage service also saw elevated error rates, although (as was the case with GCS) the user impact was greatly reduced by caching and redundancy built into those services. There will be a separate incident report for non-GCP services affected by this incident.
 The Google Cloud Platform services that experienced the most significant customer impact were the following:
 Google Cloud Storage experienced elevated long tail latency and an average error rate of 4.8%. All bucket locations and storage classes were impacted. GCP services that depend on Cloud Storage were also impacted.
 Stackdriver Monitoring experienced up to 5% errors retrieving historical time series data. Recent time series data was available. Alerting was not impacted.
 App Engine's Blobstore API experienced elevated latency and an error rate that peaked at 21% for fetching blob data. App Engine deployments experienced elevated errors that peaked at 90%. Serving of static files from App Engine also experienced elevated errors.
-## ROOT CAUSE
+## ROOT CAUSE:
 On Monday 11 March 2019, Google SREs were alerted to a significant increase in storage resources for metadata used by the internal blob service. On Tuesday 12 March, to reduce resource usage, SREs made a configuration change which had a side effect of overloading a key part of the system for looking up the location of blob data. The increased load eventually lead to a cascading failure.
 REMEDIATION AND PREVENTION
 SREs were alerted to the service disruption at 18:56 PDT and immediately stopped the job that was making configuration changes. In order to recover from the cascading failure, SREs manually reduced traffic levels to the blob service to allow tasks to start up without crashing due to high load.
@@ -556,12 +556,12 @@ We recognize the extended duration of this outage, and we sincerely apologize to
 
 # [bigquery/18026](https://status.cloud.google.com/incident/bigquery/18026)
 15:55 Mar 15, 2017
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 On Monday 13 March 2017, the BigQuery streaming API experienced 91% error rate in the US and 63% error rate in the EU for a duration of 30 minutes. We apologize for the impact of this issue on our customers, and the widespread nature of the issue in particular. We have completed a post mortem of the incident and are making changes to mitigate and prevent recurrences.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 On Monday 13 March 2017 from 10:22 to 10:52 PDT 91% of streaming API requests to US BigQuery datasets and 63% of streaming API requests to EU BigQuery datasets failed with error code 503 and an HTML message indicating "We're sorry... but your computer or network may be sending automated queries. To protect our users, we can't process your request right now."
 All non-streaming API requests, including DDL requests and query, load extract and copy jobs were unaffected.
-## ROOT CAUSE
+## ROOT CAUSE:
 The trigger for this incident was a sudden increase in log entries being streamed from Stackdriver Logging to BigQuery by logs export. The denial of service (DoS) protection used by BigQuery responded to this by rejecting excess streaming API traffic. However the configuration of the DoS protection did not adequately segregate traffic streams resulting in normal sources of BigQuery streaming API requests being rejected.
 REMEDIATION AND PREVENTION
 Google engineers initially mitigated the issue by blocking the source of unexpected load. This prevented the overload and allowed all other traffic to resume normally. Engineers fully resolved the issue by identifying and reverting the change that triggered the increase in log entries and clearing the backlog of log entries that had grown.
@@ -569,12 +569,12 @@ To prevent future occurrences, BigQuery engineers are updating configuration to 
 
 # [bigquery/18029](https://status.cloud.google.com/incident/bigquery/18029)
 23:25 Jun 20, 2017
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 For 10 minutes on Wednesday 14 June 2017, Google BigQuery experienced increased error rates for both streaming inserts and most API methods due to their dependency on metadata read operations. To our BigQuery customers whose business were impacted by this event, we sincerely apologize. We are taking immediate steps to improve BigQueryâs performance and availability.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 Starting at 10:43am US/Pacific, global error rates for BigQuery streaming inserts and API calls dependent upon metadata began to rapidly increase. The error rate for streaming inserts peaked at 100% by 10:49am. Within that same window, the error rate for metadata operations increased to a height of 80%. By 10:54am the error rates for both streaming inserts and metadata operations returned to normal operating levels.
 During the incident, affected BigQuery customers would have experienced a noticeable elevation in latency on all operations, as well as increased âService Unavailableâ and âTimeoutâ API call failures. While BigQuery streaming inserts and metadata operations were the most severely impacted, other APIs also exhibited elevated latencies and error rates, though to a much lesser degree. For API calls returning status code 2xx the operation completed with successful data ingestion and integrity.
-## ROOT CAUSE
+## ROOT CAUSE:
 On Wednesday 14 June 2017, BigQuery engineers completed the migration of BigQuery's metadata storage to an improved backend infrastructure. This effort was the culmination of work to incrementally migrate BigQuery read traffic over the course of two weeks. As the new backend infrastructure came online, there was one particular type of read traffic that hadnât yet migrated to the new metadata storage. This caused a sudden spike of that read traffic to the new backend.
 The spike came when the new storage backend had to process a large volume of incoming requests as well as allocate resources to handle the increased load. Initially the backend was able to process requests with elevated latency, but all available resources were eventually exhausted, which lead to API failures. Once the backend was able to complete the load redistribution, it began to free up resources to process existing requests and work through its backlog. BigQuery operations continued to experience elevated latency and errors for another five minutes as the large backlog of requests from the first five minutes of the incident were processed.
 REMEDIATION AND PREVENTION
@@ -585,11 +585,11 @@ Each of the 12 action items created from this event have already been assigned t
 
 # [bigquery/18030](https://status.cloud.google.com/incident/bigquery/18030)
 23:02 Jul 10, 2017
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 On Wednesday 28 June 2017, streaming data into Google BigQuery experienced elevated error rates for a period of 57 minutes.  We apologize to all users whose data ingestion pipelines were affected by this issue.  We understand the importance of reliability for a process as crucial as data ingestion and are taking committed actions to prevent a similar recurrence in the future.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 On Wednesday 28 June 2017 from 18:00 to 18:20 and from 18:40 to 19:17 US/Pacific time, BigQuery's streaming insert service returned an increased error rate to clients for all projects.  The proportion varied from time to time, but failures peaked at 43% of streaming requests returning HTTP response code 500 or 503.  Data streamed into BigQuery from clients that experienced errors without retry logic were not saved into target tables during this period of time.
-## ROOT CAUSE
+## ROOT CAUSE:
 Streaming requests are routed to different datacenters for processing based on the table ID of the destination table. A sudden increase in traffic to the BigQuery streaming service combined with diminished capacity in a datacenter resulted in that datacenter returning a significant amount of errors for tables whose IDs landed in that datacenter.  Other datacenters processing streaming data into BigQuery were unaffected.
 REMEDIATION AND PREVENTION
 Google engineers were notified of the event at 18:20, and immediately started to investigate the issue. The first set of errors had subsided, but starting at 18:40 error rates increased again. At 19:17 Google engineers redirected traffic away from the affected datacenter. The table IDs in the affected datacenter were redistributed to remaining, healthy streaming servers and error rates began to subside.
@@ -597,11 +597,11 @@ To prevent the issue from recurring, Google engineers are improving the load bal
 
 # [bigquery/18032](https://status.cloud.google.com/incident/bigquery/18032)
 08:12 Aug 02, 2017
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 On 2017-07-26, BigQuery delivered error messages for 7% of queries and 15% of exports for a duration of two hours and one minute. It also experienced elevated failures for streaming inserts for one hour and 40 minutes. If your service or application was affected, we apologize â this is not the level of quality and reliability we strive to offer you, and we are taking immediate steps to improve BigQueryâs performance and availability.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 On 2017-07-26 from 13:45 to 15:45 US/PDT, BigQuery jobs experienced elevated failures at a rate of 7% to 15%, depending on the operation attempted. Overall 7% of queries, 15% of exports, and 9% of streaming inserts failed during this event. These failures occurred in 12% of customer projects The errors for affected projects varied from 2% to 69% of exports, over 50% for queries, and up to 28.5% for streaming inserts.  Customers affected saw an error message stating that their project has ânot enabled BigQueryâ.
-## ROOT CAUSE
+## ROOT CAUSE:
 Prior to executing a BigQuery job, Googleâs Service Manager validates that the project requesting the job has BigQuery enabled for the project. The Service Manager consists of several components, including a redundant data store for project configurations, and a permissions module which inspects configurations. The project configuration data is being migrated to a new format and new version of the data store, and as part of that migration, the permissions module is being updated to use the new format. As is normal production best practices, this migration is being performed in stages separated by time.
 The root cause of this event was that, during one stage of the rollout, configuration data for two GCP datacenters was migrated before the corresponding permissions module for BigQuery was updated. As a result, the permissions module in those datacenters began erroneously reporting that projects running there no longer had BigQuery enabled. Thus, while both BigQuery and the underlying data stores were unchanged, requests to BigQuery from affected projects received an error message indicating that they had not enabled BigQuery.
 REMEDIATION AND PREVENTION
@@ -612,11 +612,11 @@ Google is committed to quickly and continually improving our technology and oper
 
 # [bigquery/18036](https://status.cloud.google.com/incident/bigquery/18036)
 14:34 May 18, 2018
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 On Wednesday 16 May 2018, Google BigQuery experienced failures of import, export and query jobs for a duration of 88 minutes over two time periods (55 minutes initially, and 33 minutes in the second, which was isolated to the EU). We sincerely apologize to all of our affected customers; this is not the level of reliability we aim to provide in our products. We will be issuing SLA credits to customers who were affected by this incident and we are taking immediate steps to prevent a future recurrence of these failures.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 On Wednesday 16 May 2018 from 16:00 to 16:55 and from to 17:45 to 18:18 PDT, Google BigQuery experienced a failure of some import, export and query jobs. During the first period of impact, there was a 15.26% job failure rate; during the second, which was isolated to the EU, there was a 2.23% error rate. Affected jobs would have failed with INTERNAL_ERROR as the reason.
-## ROOT CAUSE
+## ROOT CAUSE:
 Configuration changes being rolled out on the evening of the incident were not applied in the intended order. This resulted in an incomplete configuration change becoming live in some zones, subsequently triggering the failure of customer jobs. During the process of rolling back the configuration, another incorrect configuration change was inadvertently applied, causing the second batch of job failures.
 REMEDIATION AND PREVENTION
 Automated monitoring alerted engineering teams 15 minutes after the error threshold was met and were able to correlate the errors with the configuration change 3 minutes later. We feel that the configured alert delay is too long and have lowered it to 5 minutes in order to aid in quicker detection.
@@ -625,11 +625,11 @@ In addition, we're switching to a different configuration system which will ensu
 
 # [bigquery/18037](https://status.cloud.google.com/incident/bigquery/18037)
 09:22 Jun 27, 2018
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 On Friday 22 June 2018, Google BigQuery experienced increased query failures for a duration of 1 hour 6 minutes. We apologize for the impact of this issue on our customers and are making changes to mitigate and prevent a recurrence.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 On Friday 22 June 2018 from 12:06 to 13:12 PDT, up to 50% of total requests to the BigQuery API failed with error code 503. Error rates varied during the incident, with some customers experiencing 100% failure rate for their BigQuery table jobs. bigquery.tabledata.insertAll jobs were unaffected.
-## ROOT CAUSE
+## ROOT CAUSE:
 A new release of the BigQuery API introduced a software defect that caused the API component to return larger-than-normal responses to the BigQuery router server. The router server is responsible for examining each request, routing it to a backend server, and returning the response to the client. To process these large responses, the router server allocated more memory which led to an increase in garbage collection. This resulted in an increase in CPU utilization, which caused our automated load balancing system to shrink the server capacity as a safeguard against abuse. With the reduced capacity and now comparatively large throughput of requests, the denial of service protection system used by BigQuery responded by rejecting user requests, causing a high rate of 503 errors.
 REMEDIATION AND PREVENTION
 Google Engineers initially mitigated the issue by increasing the capacity of the BigQuery router server which prevented overload and allowed API traffic to resume normally. The issue was fully resolved by identifying and reverting the change that caused large response sizes.
@@ -638,9 +638,9 @@ We apologize once again for the impact of this incident on your business.
 
 # [bigquery/19002](https://status.cloud.google.com/incident/bigquery/19002)
 11:25 Mar 18, 2019
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 On Friday 8 March 2019, Google BigQueryâs jobs.insert API in the US regions experienced an average elevated error rate of 51.21% for a duration of 45 minutes. BigQueryâs Streaming API was unaffected during this period. We understand how important BigQueryâs availability is to our customersâ business analytics and we sincerely apologize for the impact caused by this incident. We are taking immediate steps detailed below to prevent this situation from happening again.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 On Friday 8 March 2019 from 00:45 - 01:30 US/Pacific, BigQueryâs jobs.insert [1] API (responsible for import/export, query, and copy jobs) in the US region experienced an average error rate of 51.21%. Affected customers received error responses such as âError encountered during Execution, retrying may solve the problemâ and âRead timed outâ when sending requests to BigQuery. BigQueryâs Streaming API was not impacted by this incident.
 The following is a breakdown of the errors experienced during the incident:
 
@@ -648,7 +648,7 @@ The following is a breakdown of the errors experienced during the incident:
 The jobs.insert API experienced an average error rate of 51.21% and a peak error rate of 75.96% percent at 01:21 US/Pacific
 17.93% of BigQuery projects in the region were impacted
 
-## ROOT CAUSE
+## ROOT CAUSE:
 A recent change to BigQueryâs shuffle scheduling service [2] introduced the potential for the service to enter a state where it was unable to process shuffle jobs. A new canary release was deployed to fix the potential issue. However, this release contained an unrelated issue which placed an overly restrictive rate limit on the shuffle service preventing it from operating nominally. This strict rate limit created a large job backlog for the BigQuery Job Server, which resulted in BigQuery returning errors such as âError encountered during Execution, retrying may solve the problemâ and âRead timed outâ to users.
 REMEDIATION AND PREVENTION
 Google Engineers were automatically alerted at 00:47 and immediately began their investigation. The root cause was discovered at 01:23, and our engineers worked quickly to mitigate the issue by redirecting traffic away from the impacted datacenter at 01:27. The incident was fully resolved by 01:30.
@@ -658,11 +658,11 @@ We are taking immediate action to prevent recurrence. First, we have implemented
 
 # [bigquery/19003](https://status.cloud.google.com/incident/bigquery/19003)
 21:00 May 23, 2019
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 On Friday, May 17 2019, 83% of Google BigQuery insert jobs in the US multi-region failed for a duration of 27 minutes. Query jobs experienced an average error rate of 16.7% for a duration of 2 hours. BigQuery users in the US multi-region also observed elevated latency for a duration of 4 hours and 40 minutes. To our BigQuery customers whose business analytics were impacted during this outage, we sincerely apologize â this is not the level of quality and reliability we strive to offer you, and we are taking immediate steps to improve the platformâs performance and availability.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 On Friday May 17 2019, from 08:30 to 08:57 US/Pacific, 83% of Google BigQuery insert jobs failed for 27 minutes in the US multi-region. From 07:30 to 09:30 US/Pacific, query jobs in US multi-region returned an average error rate of 16.7%. Other jobs such as list, cancel, get, and getQueryResults in the US multi-region were also affected for 2 hours along with query jobs. Google BigQuery users observed elevated latencies for job completion from 07:30 to 12:10 US/Pacific. BigQuery jobs in regions outside of the US remained unaffected.
-## ROOT CAUSE
+## ROOT CAUSE:
 The incident was triggered by a sudden increase in queries in US multi-region leading to quota exhaustion in the storage system serving incoming requests. Detecting the sudden increase, BigQuery initiated its auto-defense mechanism and redirected user requests to a different location. The high load of requests triggered an issue in the scheduling system, causing delays in scheduling incoming queries. These delays resulted in errors for query, insert, list, cancel, get and getQueryResults BigQuery jobs and overall latency experienced by users. As a result of these high number of requests at 08:30 US/Pacific, the scheduling systemâs overload protection mechanism began rejecting further incoming requests, causing insert job failures for 27 minutes.
 REMEDIATION AND PREVENTION
 BigQueryâs defense mechanism began redirection at 07:50 US/Pacific. Google Engineers were automatically alerted at 07:54 US/Pacific and began investigation. The issue with the scheduler system began at 08:00 and our engineers were alerted again at 08:10. At 08:43, they restarted the scheduling system which mitigated the insert job failures by 08:57. Errors seen for insert, query, cancel, list, get and getQueryResults jobs  were mitigated by 09:30 when queries were redirected to different locations. Google engineers then successfully blocked the source of sudden incoming queries that helped reduce overall latency. The issue was fully resolved at 12:10 US/Pacific when all active and pending queries completed running.
@@ -684,14 +684,14 @@ We apologize for the difficulty this issue caused you.
 
 # [cloud/datastore/17002](https://status.cloud.google.com/incident/cloud/datastore/17002)
 14:00 Feb 21, 2017
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 On Tuesday 14 February 2017, some applications using Google Cloud Datastore in Western Europe or the App Engine Search API in Western Europe experienced 2%-4% error rates and elevated latency for three periods with an aggregate duration of three hours and 36 minutes. We apologize for the disruption this caused to your service. We have already taken several measures to prevent incidents of this type from recurring and to improve the reliability of these services.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 On Tuesday 14 February 2017 between 00:15 and 01:18 PST, 54% of applications using Google Cloud Datastore in Western Europe or the App Engine Search API in Western Europe experienced elevated error rates and latency. The average error rate for affected applications was 4%.
 Between 08:35 and 08:48 PST, 50% of applications using Google Cloud Datastore in Western Europe or the App Engine Search API in Western Europe experienced elevated error rates. The average error rate for affected applications was 4%.
 Between 12:20 and 14:40 PST, 32% of applications using Google Cloud Datastore in Western Europe or the App Engine Search API in Western Europe experienced elevated error rates and latency. The average error rate for affected applications was 2%.
 Errors received by affected applications for all three incidents were either "internal error" or "timeout".
-## ROOT CAUSE
+## ROOT CAUSE:
 The incident was caused by a latent bug in a service used by both Cloud Datastore and the App Engine Search API that was triggered by high load on the service.
 Starting at 00:15 PST, several applications changed their usage patterns in one zone in Western Europe and began running more complex queries, which caused higher load on the service.
 REMEDIATION AND PREVENTION
@@ -705,23 +705,23 @@ Once again, we apologize for the impact of this incident on your application.
 
 # [cloud/datastore/19001](https://status.cloud.google.com/incident/cloud/datastore/19001)
 14:00 Feb 14, 2019
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 Cloud Datastore experienced a low rate of errors associated with a small subset of high write-rate databases. We have separately notified the customers who may have been potentially impacted by these errors.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 Beginning Wednesday December 19, 2018 and ending January 19 2019, Cloud Datastore experienced a low rate of errors associated with a small subset of high write-rate databases. Less than 0.1% of databases may have experienced these errors when called from the us-central1 region. We have separately notified the customers who may have been potentially impacted by these errors.
 REMEDIATION AND PREVENTION
 We have identified and remediated the issue. As part of the remediation, we reverted to an earlier rollout ending the event. After verifying the issue was resolved, Google is taking steps to improve our existing testing scenarios to help prevent future recurrence.
 
 # [cloud/iam/18001](https://status.cloud.google.com/incident/cloud/iam/18001)
 09:20 Jul 02, 2018
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 On Wednesday 27 June 2018, Google Cloud Console and Google Cloud Resource Manager API experienced a significant performance degradation for a duration of 51 minutes. Although, this did not affect user resources running on the Google Cloud Platform, we understand that our customers rely heavily on Google Cloud Console to manage their resources and we sincerely apologize to everyone who was affected by the incident.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 From 14:21 to 15:11 PDT, users were unable to manage their folders, projects and organizations using Google Cloud Console, Google Cloud Resource Manager API and gcloud command line. The following APIs were affected:
 Google Cloud Console: Impacted users were unable to list their projects, search for projects, folders and organizations or view their bill. Search box failed to return the above too.
 Google Cloud Resource Manager API: Impacted users were unable to list their projects, folders and organizations
 BigQuery: Impacted users were unable to list their bigquery projects using the API.
-## ROOT CAUSE
+## ROOT CAUSE:
 The incident was triggered by a configuration change in the search infrastructure powering Cloud resource metadata search. The search infrastructure sends ACL checks to a central ACL server to make sure the end user has access to the Cloud resource metadata it plans to return. The configuration change introduced a new field in the ACL check request, while the central ACL server had not whitelisted the search infrastructure to send that field, causing an outage in Cloud resource metadata search.
 REMEDIATION AND PREVENTION
 At 12:26 PDT, Google Engineers rolled out the configuration change. Our automated release validation system rejected the change due to a high rate of errors. Around 14:16 PDT, an unrelated change was made to the same search infrastructure which triggered a bug that disabled its automated release validation system. This change also inadvertently picked up the prior configuration change and due to the lack of automated release validation, the change was successfully propagated to production.  Within a span of few minutes, several engineering teams were automatically alerted to the situation and began the mitigation process.
@@ -734,13 +734,13 @@ Improving testing and staging alerts to catch issues of this nature before they 
 # [cloud/networking/17002](https://status.cloud.google.com/incident/cloud/networking/17002)
 17:16 Sep 05, 2017
 Revised Tuesday 05 September 2017 to clarify the impact and timing.
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 For portions of Tuesday 29 August and Wednesday 30 August 2017, some Google Compute Engine instances which were live migrated from one server to another stopped receiving network traffic from Google Cloud Network Load Balancers and Internal Load balancers. On average, less than 1% of GCE instances were affected by this behavior over the duration of the incident, and at its peak, 2% of instances were affected. For the 2% of instances which were ultimately affected, the mean duration of the impact was 9 hours and the maximum duration was 30 hours and 22 minutes. We apologize for the impact this had on your services. We are particularly cognizant of the unusual duration of the incident. We have completed an extensive postmortem to learn from the issue and improve Google Cloud Platform.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 Any GCE instance that was live-migrated between 13:56 PDT on Tuesday 29 August 2017 and 08:32 on Wednesday 30 August 2017 became unreachable via Google Cloud Network or Internal Load Balancing until between 08:56 and 14:18 (for regions other than us-central1) or 20:16 (for us-central1) on Wednesday. See https://goo.gl/NjqQ31 for a visual representation of the cumulative number of instances live-migrated over time.
 Our internal investigation shows that, at peak, 2% of GCE instances were affected by the issue.
 Instances which were not live-migrated during this period were not affected. In addition, instances that do not use Network Load Balancing or Internal Load Balancing were not affected. Related capabilities such as Google Cloud HTTP(S) Load Balancing, TCP and SSL Proxy Load Balancing and direct connectivity on instance internal and external IP addresses were unaffected.
-## ROOT CAUSE
+## ROOT CAUSE:
 Live-migration transfers a running VM from one host machine to another host machine within the same zone. All VM properties and attributes remain unchanged, including internal and external IP addresses, instance metadata, block storage data and volumes, OS and application state, network settings, network connections, and so on.
 In this case, a change in the internal representation of networking information in VM instances caused inconsistency between two values, both of which were supposed to hold the external and internal virtual IP addresses of load balancers. When an affected instance was live-migrated, the instance was deprogrammed from the load balancer because of the inconsistency.  This made it impossible for load balancers that used the instance as backend to look up the destination IP address of the instance following its migration, so traffic destined for that instance was not forwarded from the load balancer.
 REMEDIATION AND PREVENTION
@@ -749,9 +749,9 @@ In order to prevent the issue from recurring, Google engineers are enhancing the
 
 # [cloud/networking/18003](https://status.cloud.google.com/incident/cloud/networking/18003)
 16:42 Feb 16, 2018
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 On Sunday 18 January 2018, Google Compute Engine networking experienced a network programming failure.  The two impacts of this incident included the autoscaler not scaling instance groups, as well as migrated and newly-created VMs not communicating with VMs in other zones for a duration of up to 93 minutes. We apologize for the impact this event had on your applications and projects, and we will carefully investigate the causes and implement measures to prevent recurrences.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 On Sunday 18 January 2018, Google Compute Engine network provisioning updates failed in the following zones: 
 europe-west3-a for 34 minutes (09:52 AM to 10:21 AM PT)
 us-central1-b for 79 minutes (09:57 AM to 11:16 AM PT)
@@ -759,7 +759,7 @@ asia-northeast1-a for 93 minutes (09:53 AM to 11:26 AM PT)
 Propagation of Google Compute Engine networking configuration for newly created and migrated VMs is handled by two components. The first is responsible for providing a complete list of VMâs, networks, firewall rules, and scaling decisions.  The second component provides a stream of updates for the components in a specific zone.
 During the affected period, the first component failed to return data.  VMs in the affected zones were unable to communicate with newly-created or migrated VMs in another zone in the same private GCE network. VMs in the same zone were unaffected because they are updated by the streaming component.
 The autoscaler service also relies upon data from the failed first component to scale instance groups; without updates from that component, it could not make scaling decisions for the affected zones.
-## ROOT CAUSE
+## ROOT CAUSE:
 A stuck process failed to provide updates to the Compute Engine control plane.  Automatic failover was unable to force-stop the process, and required manual failover to restore normal operation.
 REMEDIATION AND PREVENTION
 The engineering team was alerted when the propagation of network configuration information stalled.  They manually failed over to the replacement task to restore normal operation of the data persistence layer.
@@ -769,11 +769,11 @@ Modify the data persistence layer to re-resolve their peers during long-running 
 
 # [cloud/networking/18007](https://status.cloud.google.com/incident/cloud/networking/18007)
 08:24 May 08, 2018
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 On Wednesday 2 May, 2018 Google Cloud Networking experienced increased packet loss to the internet as well as other Google regions from the us-central1 region for a duration of 21 minutes. We understand that the network is a critical component that binds all services together. We have conducted an internal investigation and are taking steps to improve our service.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 On Wednesday 2 May, 2018 from 13:47 to 14:08 PDT, traffic between all zones in the us-central1 region and all destinations experienced 12% packet loss. Traffic between us-central1 zones experienced 22% packet loss. Customers may have seen requests succeed to services hosted in us-central1 as loss was not evenly distributed, some connections did not experience any loss while others experienced 100% packet loss.
-## ROOT CAUSE
+## ROOT CAUSE:
 A control plane is used to manage configuration changes to the network fabric connecting zones in us-central1 to each other as well as the Internet. On Wednesday 2 May, 2018 Google Cloud Network engineering began deploying a configuration change using the control plane as part of planned maintenance work. During the deployment, a bad configuration was generated that blackholed a portion of the traffic flowing over the fabric.
 The control plane had a bug in it, which caused it to produce an incorrect configuration. New configurations deployed to the network fabric are evaluated for correctness, and regenerated if an error is found. In this case, the configuration error appeared after the configuration was evaluated, which resulted in deploying the erroneous configuration to the network fabric.
 REMEDIATION AND PREVENTION
@@ -784,11 +784,11 @@ Again, we would like to apologize for this issue. We are taking immediate steps 
 
 # [cloud/networking/18009](https://status.cloud.google.com/incident/cloud/networking/18009)
 13:32 May 22, 2018
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 On Wednesday 16 May 2018, Google Cloud Networking experienced loss of connectivity to external IP addresses located in us-east4 for a duration of 58 minutes.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 On Wednesday 16 May 2018 from 18:43 to 19:41 PDT, Google Compute Engine, Google Cloud VPN, and Google Cloud Network Load Balancers hosted in the us-east4 region experienced 100% packet loss from the internet and other GCP regions. Google Dedicated Interconnect Attachments located in us-east4 also experienced loss of connectivity.
-## ROOT CAUSE
+## ROOT CAUSE:
 Every zone in Google Cloud Platform advertises several sets of IP addresses to the Internet via BGP.  Some of these IP addresses are global and are advertised from every zone, others are regional and advertised only from zones in the region. The software that controls the advertisement of these IP addresses contained a race condition during application startup that would cause regional IP addresses to be filtered out and withdrawn from a zone. During a routine binary rollout of this software, the race condition was triggered in each of the three zones in the us-east4 region. Traffic continued to be routed until the last zone received the rollout and stopped advertising regional prefixes. Once the last zone stopped advertising the regional IP addresses, external regional traffic stopped entering us-east4.
 REMEDIATION AND PREVENTION
 Google engineers were alerted to the problem within one minute and as soon as investigation pointed to a problem with the BGP advertisements, a rollback of the binary in the us-east4 region was created to mitigate the issue. Once the rollback proved effective, the original rollout was paused globally to prevent any further issues.
@@ -797,13 +797,13 @@ We apologize for this incident and we recognize that regional outages like this 
 
 # [cloud/networking/18012](https://status.cloud.google.com/incident/cloud/networking/18012)
 17:26 Jul 18, 2018
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 On Tuesday, 17 July 2018, customers using Google Cloud App Engine, Google HTTP(S) Load Balancer, or TCP/SSL Proxy Load Balancers experienced elevated error rates ranging between 33% and 87% for a duration of 32 minutes. Customers observed errors consisting of either 502 return codes, or connection resets. We apologize to our customers whose services or businesses were impacted during this incident, and we are taking immediate steps to improve the platformâs performance and availability. We will be providing customers with a SLA credit for the affected timeframe that impacted the Google Cloud HTTP(S) Load Balancer, TCP/SSL Proxy Load Balancer and Google App Engine products.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 On Tuesday, 17 July 2018, from 12:17 to 12:49 PDT, Google Cloud HTTP(S) Load Balancers returned 502s for some requests they received. The proportion of 502 return codes varied from 33% to 87% during the period. Automated monitoring alerted Googleâs engineering team to the event at 12:19, and at 12:44 the team had identified the probable root cause and deployed a fix. At 12:49 the fix became effective and the rate of 502s rapidly returned to a normal level. Services experienced degraded latency for several minutes longer as traffic returned and caches warmed. Serving fully recovered by 12:55. Connections to Cloud TCP/SSL Proxy Load Balancers would have been reset after connections to backends failed. Cloud services depending upon Cloud HTTP Load Balancing, such as Google App Engine application serving, Google Cloud Functions, Stackdriver's web UI, Dialogflow and the Cloud Support Portal/API, were affected for the duration of the incident.
 Cloud CDN cache hits dropped 70% due to decreased references to Cloud CDN URLs from services behind Cloud HTTP(S) Load balancers and an inability to validate stale cache entries or insert new content on cache misses. Services running on Google Kubernetes Engine and using the Ingress resource would have served 502 return codes as mentioned above. Google Cloud Storage traffic served via Cloud Load Balancers was also impacted.
 Other Google Cloud Platform services were not impacted. For example, applications and services that use direct VM access, or Network Load Balancing, were not affected.
-## ROOT CAUSE
+## ROOT CAUSE:
 Googleâs Global Load Balancers are based on a two-tiered architecture of Google Front Ends (GFE). The first tier of GFEs answer requests as close to the user as possible to maximize performance during connection setup. These GFEs route requests to a second layer of GFEs located close to the service which the request makes use of. This type of architecture allows clients to have low latency connections anywhere in the world, while taking advantage of Googleâs global network to serve requests to backends, regardless of in which region they are located.
 The GFE development team was in the process of adding features to GFE to improve security and performance. These features had been introduced into the second layer GFE code base but not yet put into service. One of the features contained a bug which would cause the GFE to restart; this bug had not been detected in either of testing and initial rollout. At the beginning of the event, a configuration change in the production environment triggered the bug intermittently, which caused affected GFEs to repeatedly restart. Since restarts are not instantaneous, the available second layer GFE capacity was reduced. While some requests were correctly answered, other requests were interrupted (leading to connection resets) or denied due to a temporary lack of capacity while the GFEs were coming back online.
 REMEDIATION AND PREVENTION
@@ -817,11 +817,11 @@ We would again like to apologize for the impact that this incident had on our cu
 
 # [cloud/networking/18013](https://status.cloud.google.com/incident/cloud/networking/18013)
 14:51 Aug 07, 2018
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 On Friday 27 July 2018, for a duration of 1 hour 4 minutes, Google Compute Engine (GCE) instances and Cloud VPN tunnels in europe-west4 experienced loss of connectivity to the Internet. The incident affected all new or recently live migrated GCE instances. VPN tunnels created during the incident were also impacted. We apologize to our customers whose services or businesses were impacted during this incident, and we are taking immediate steps to avoid a recurrence.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 All Google Compute Engine (GCE) instances in europe-west4 created on Friday 27 July 2018 from 18:27 to 19:31 PDT lost connectivity to the Internet and other instances via their public IP addresses. Additionally any instances that live migrated during the outage period would have lost connectivity for approximately 30 minutes after the live migration completed. All Cloud VPN tunnels created during the impact period, and less than 1% of existing tunnels in europe-west4 also lost external connectivity. All other instances and VPN tunnels continued to serve traffic. Inter-instance traffic via private IP addresses remained unaffected.
-## ROOT CAUSE
+## ROOT CAUSE:
 Google's datacenters utilize software load balancers known as Maglevs [1] to efficiently load balance network traffic [2] across service backends. The issue was caused by an unintended side effect of a configuration change made to jobs that are critical in coordinating the availability of Maglevs. The change unintentionally lowered the priority of these jobs in europe-west4. The issue was subsequently triggered when a datacenter maintenance event required load shedding of low priority jobs. This resulted in failure of a portion of the Maglev load balancers. However, a safeguard in the network control plane ensured that some Maglev capacity remained available. This layer of our typical defense-in-depth allowed connectivity to extant cloud resources to remain up, and restricted the disruption to new or migrated GCE instances and Cloud VPN tunnels.
 REMEDIATION AND PREVENTION
 Automated monitoring alerted Googleâs engineering team to the event within 5 minutes and they immediately began investigating at 18:36. At 19:25 the team discovered the root cause and started reverting the configuration change. The issue was mitigated at 19:31 when the fix was rolled out. At this point, connectivity was restored immediately.
@@ -832,10 +832,10 @@ We would again like to apologize for the impact that this incident had on our cu
 
 # [cloud/networking/18016](https://status.cloud.google.com/incident/cloud/networking/18016)
 21:07 Oct 12, 2018
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 On Thursday 11 October 2018, a section of Google's network that includes part of us-central1-c lost connectivity to the Google network backbone that connects to the public internet for a duration of 41 minutes.
 We apologize if your service or application was impacted by this incident. We are following our postmortem process to ensure we fully understand what caused this incident and to determine the exact steps we can take to prevent incidents of this type from recurring. Our engineering team is committed to prioritizing fixes for the most critical findings that result from our postmortem.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 On Thursday 11 October 2018 from 16:13 to 16:54 PDT, a section of Google's network that includes part of us-central1-c lost connectivity to the Google network backbone that connects to the public internet.
 The us-central1-c zone is composed of two separate physical clusters. 61% of the VMs in us-central1-c were in the cluster impacted by this incident. Projects that create VMs in this zone have all of their VMs assigned to a single cluster. Customers with VMs in the zone were either impacted for all of their VMs in a project or for none.
 Impacted VMs could not communicate with VMs outside us-central1 during the incident. VM-to-VM traffic using an internal IP address within us-central1 was not affected.
@@ -844,7 +844,7 @@ Traffic through the HTTP(S), SSL Proxy, and TCP proxy load balancers was not sig
 Other Google Cloud Platform services that experienced significant impact include the following:
 30% of Cloud Bigtable clusters located in us-central1-c became unreachable.
 10% of Cloud SQL instances in us-central lost external connectivity.
-## ROOT CAUSE
+## ROOT CAUSE:
 The incident occurred while Google's network operations team was replacing the routers that link us-central1-c to Google's backbone that connects to the public internet. Google engineers paused the router replacement process after determining that additional cabling would be required to complete the process and decided to start a rollback operation. The rollout and rollback operations utilized a version of workflow that was only compatible with the newer routers. Specifically, rollback was not supported on the older routers. When a configuration change was pushed to the older routers during the rollback, it deleted the Border Gateway Protocol (BGP) control plane sessions connecting the datacenter routers to the backbone routers resulting in a loss of external connectivity.
 REMEDIATION AND PREVENTION
 The BGP sessions were deleted in two tranches. The first deletion was at 15:43 and caused traffic to failover to other routers. The second set of BGP sessions were deleted at 16:13. The first alert for Google engineers fired at 16:16. We identified that the BGP sessions had been deleted at 16:41 and rolled back the configuration change at 16:52, ending the incident shortly thereafter.
@@ -854,11 +854,11 @@ Alert when BGP sessions are deleted and traffic fails off, so that we can detect
 
 # [cloud/networking/18019](https://status.cloud.google.com/incident/cloud/networking/18019)
 14:49 Dec 21, 2018
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 On Wednesday 19 December 2018 multiple GCP services in europe-west1-b experienced a disruption for a duration of 34 minutes. Several GCP services were impacted: GCE, Monitoring, Cloud Console, GAE Admin API, Task Queues, Cloud Spanner, Cloud SQL, GKE, Cloud Bigtable, and Redis. GCP services in all other zones remained unaffected.
 This service disruption was caused by an erroneous trigger leading to a switch re-installation during upgrades to two control plane network (CPN) switches impacting a portion of europe-west1-b. Most impacted GCP services in the zone recovered within a few minutes after the issue was mitigated.
 We understand that these services are critical to our customers and sincerely apologize for the disruption caused by this incident. To prevent the issue from recurring we are fixing our repair workflows to catch such errors before serving traffic.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 On Wednesday 19 December 2018 from 05:53 to 06:27 US/Pacific, multiple GCP services in europe-west1-b experienced disruption due to a network outage in one of Googleâs data centers.
 The following Google Cloud Services in europe-west1-b were impacted: GCE instance creation, GCE networking, Cloud VPN, Cloud Interconnect,  Stackdriver Monitoring API, Cloud Console, App Engine Admin API, App Engine Task Queues, Cloud Spanner, Cloud SQL, GKE, Cloud Bigtable, and Cloud Memorystore for Redis. Most of these services suffered a brief disruption during the duration of the incident and recovered when the issue was mitigated.
 
@@ -870,7 +870,7 @@ list.
 Redis: After the network outage ended, ~50 standard Redis instances in europe-west1 remained
 unavailable until 07:55 US/Pacific due to a failover bug triggered by the outage. 
 
-## ROOT CAUSE
+## ROOT CAUSE:
 As part of a program to upgrade network switches in control plane networks across Googleâs data center, two control plane network (CPN) switches supporting a single CPN were scheduled to undergo upgrades. On December 17, the first switch was upgraded and was back online the same day. The issue triggered on December 19 when the second switch was due to be upgraded. During the upgrade of the second switch, a reinstallation was erroneously triggered on the first switch, causing it to go offline for a short period of time. Having both switches down partitioned the network supporting a portion of europe-west1-b. Due to this isolation, the zone was left partially functional.
 REMEDIATION AND PREVENTION
 The issue was mitigated at 06:27 US/Pacific when reinstallation of the first switch in the CPN completed.
@@ -878,12 +878,12 @@ To prevent the issue from recurring we are changing the switch upgrade workflow 
 
 # [cloud/networking/19005](https://status.cloud.google.com/incident/cloud/networking/19005)
 13:43 Mar 12, 2019
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 On Wednesday 6 March 2019, Google Cloud Router and Cloud Interconnect experienced a service disruption in the us-east4 region for a duration of 8 hours and 34 minutes. Cloud VPN configurations with dynamic routes via Cloud Router were impacted during this time. We apologize to our customers who were impacted by this outage.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 On Wednesday 6 March 2019 from 20:17 to Thursday 7 March 04:51 US/Pacific, Cloud Router and Cloud Interconnect experienced a service disruption in us-east4. Customers utilizing us-east4 were unable to advertise routes to their Google Compute Engine (GCE) instances or learn routes from GCE.
 Cloud VPN traffic with dynamic routes over Cloud Router and Cloud Interconnect in us-east4 was impacted by this service disruption. Cloud VPN traffic over pre-configured static routes was unaffected and continued to function without disruption during this time.
-## ROOT CAUSE
+## ROOT CAUSE:
 The Cloud Router control plane service assigns Cloud Router tasks to individual customers and creates routes between those tasks and customer VPCs. Individual Cloud Router tasks establish external BGP sessions and propagate routes to and from the control plane service.
 A disruption occurred during the rollout of a new version of the control plane service in us-east4. This required the control plane to restart from a âcoldâ state requiring it to validate all assignments of the Cloud Router tasks. The control plane service did not successfully initialize and it was unable to assign individual Cloud Router tasks in order to propagate routes between those tasks and customer VPCs. Cloud Router tasks became temporarily disassociated with customers and BGP sessions were terminated. As a result, Cloud VPN and Cloud Interconnect configurations that were dependent on Cloud Router in us-east4 were unavailable during this time.
 REMEDIATION AND PREVENTION
@@ -892,11 +892,11 @@ We are taking immediate steps to prevent recurrence. The issue that prevented th
 
 # [cloud/networking/19007](https://status.cloud.google.com/incident/cloud/networking/19007)
 18:10 Apr 10, 2019
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 On Thursday 4 April 2019, Cloud VPN  configurations with dynamic routes via Cloud Router, Cloud Dedicated Interconnect attachments, and Cloud Partner Interconnect attachments in us-central1 experienced a service disruption for a duration of 70 minutes.  We apologize to all our customers who were impacted by the incident.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 On Thursday 4 April 2019, from 15:40 to 16:50 US/Pacific, Google Cloud Routers and Cloud Interconnect experienced a service disruption in us-central1. Cloud Routers for Cloud Interconnect and Cloud VPN were unable to route traffic in us-central1 for the duration of the incident. This impacted Cloud Private Interconnect attachments and Cloud VPN tunnels using dynamic routing. Global routing and Cloud VPN tunnels utilizing static routes were not affected during the incident.
-## ROOT CAUSE
+## ROOT CAUSE:
 The Cloud Router control plane service assigns Cloud Router tasks to individual customers and creates routes between those tasks and customer VPCs. Individual Cloud Router tasks connected to the control plane service are responsible for establishing external BGP sessions and propagating routes to and from the service.
 The disruption was caused by a rollout to the Cloud Router control plane service. One part of the control plane rollout process changed the version of the service which cloud router tasks connect to, performed through a leader election process. When the new version was elected leader, cloud router tasks encountered an issue while disassociating with the previous leader. This issue caused tasks to stay connected to the previous leader for an extended duration. The delay resulted in individual cloud router tasks losing state, requiring the system to be initialized from a âcoldâ state.
 Changes in the new version allowed the system to complete initialization without any intervention. During initialization, cloud router tasks were reassigned to customers and started to re-establish sessions. Until all customersâ tasks were reassigned, routes learned from these Cloud Routers were not propagated and services dependent on Cloud Routers remained impacted in us-central1.
@@ -907,11 +907,11 @@ Should a âcoldâ state initialization reoccur, we are optimizing the in
 
 # [cloud/networking/19009](https://status.cloud.google.com/incident/cloud/networking/19009)
 09:42 Jun 06, 2019
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 On Sunday 2 June, 2019, Google Cloud projects running services in multiple US regions experienced elevated packet loss as a result of network congestion for a duration of between 3 hours 19 minutes, and 4 hours 25 minutes. The duration and degree of packet loss varied considerably from region to region and is explained in detail below. Other Google Cloud services which depend on Google's US network were also impacted, as were several non-Cloud Google services which could not fully redirect users to unaffected regions. Customers may have experienced increased latency, intermittent errors, and connectivity loss to instances in us-central1, us-east1, us-east4, us-west2, northamerica-northeast1, and southamerica-east1. Google Cloud instances in us-west1, and all European regions and Asian regions, did not experience regional network congestion.
 Google Cloud Platform services were affected until mitigation completed for each region, including: Google Compute Engine, App Engine, Cloud Endpoints, Cloud Interconnect, Cloud VPN, Cloud Console, Stackdriver Metrics, Cloud Pub/Sub, Bigquery, regional Cloud Spanner instances, and Cloud Storage regional buckets. G Suite services in these regions were also affected.
 We apologize to our customers whose services or businesses were impacted during this incident, and we are taking immediate steps to improve the platformâs performance and availability. A detailed assessment of impact is at the end of this report.
-## ROOT CAUSE AND REMEDIATION
+ROOT CAUSE AND REMEDIATION
 This was a major outage, both in its scope and duration. As is always the case in such instances, multiple failures combined to amplify the impact.
 Within any single physical datacenter location, Google's machines are segregated into multiple logical clusters which have their own dedicated cluster management software, providing resilience to failure of any individual cluster manager. Google's network control plane runs under the control of different instances of the same cluster management software; in any single location, again, multiple instances of that cluster management software are used, so that failure of any individual instance has no impact on network capacity.
 Google's cluster management software plays a significant role in automating datacenter maintenance events, like power infrastructure changes or network augmentation. Google's scale means that maintenance events are globally common, although rare in any single location. Jobs run by the cluster management software are labelled with an indication of how they should behave in the face of such an event: typically jobs are either moved to a machine which is not under maintenance, or stopped and rescheduled after the event.
@@ -928,7 +928,7 @@ We have immediately halted the datacenter automation software which deschedules 
 Google's network control plane software and supporting infrastructure will be reconfigured such that it handles datacenter maintenance events correctly, by rejecting maintenance requests of the type implicated in this incident. Furthermore, the network control plane in any single location will be modified to persist its configuration so that the configuration does not need to be rebuilt and redistributed in the event of all jobs being descheduled. This will reduce recovery time by an order of magnitude. Finally, Google's network will be updated to continue in 'fail static' mode for a longer period in the event of loss of the control plane, to allow an adequate window for recovery with no user impact.
 Google's emergency response tooling and procedures will be reviewed, updated and tested to ensure that they are robust to network failures of this kind, including our tooling for communicating with the customer base. Furthermore, we will extend our continuous disaster recovery testing regime to include this and other similarly catastrophic failures.
 Our post-mortem process will be thorough and broad, and remains at a relatively early stage. Further action items may be identified as this process progresses.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 Compute Engine
 Compute Engine instances in us-east4, us-west2, northamerica-northeast1 and southamerica-east1 were inaccessible for the duration of the incident, with recovery times as described above.
 Instance to instance packet loss for traffic on private IPs and internet traffic:
@@ -1013,11 +1013,11 @@ We apologize for the inconvenience this issue caused our customers.
 
 # [cloud/pubsub/17001](https://status.cloud.google.com/incident/cloud/pubsub/17001)
 22:19 Mar 29, 2017
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 On Tuesday 21 March 2017, new connections to Cloud Pub/Sub experienced high latency leading to timeouts and elevated error rates for a duration of 95 minutes. Connections established before the start of this issue were not affected. If your service or application was affected, we apologize â this is not the level of quality and reliability we strive to offer you, and we are taking immediate steps to improve the platformâs performance and availability.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 On Tuesday 21 March 2017 from 21:08 to 22:43 US/Pacific, Cloud Pub/Sub publish, pull and ack methods experienced elevated latency, leading to timeouts. The average error rate for the issue duration was 0.66%. The highest error rate occurred at 21:43, when the Pub/Sub publish error rate peaked at 4.1%, the ack error rate reached 5.7% and the pull error rate was 0.02%.
-## ROOT CAUSE
+## ROOT CAUSE:
 The issue was caused by the rollout of a storage system used by the Pub/Sub service.  As part of this rollout, some servers were taken out of service, and as planned, their load was redirected to remaining servers.  However, an unexpected imbalance in key distribution led some of the remaining servers to become overloaded. The Pub/Sub service was then unable to retrieve the status required to route new connections for the affected methods. Additionally, some Pub/Sub servers didnât recover promptly after the storage system had been stabilized and required individual restarts to fully recover.
 REMEDIATION AND PREVENTION
 Google engineers were alerted by automated monitoring seven minutes after initial impact.  At 21:24, they had correlated the issue with the storage system rollout and stopped it from proceeding further.  At 21:41, engineers restarted some of the storage servers, which improved systemic availability. Observed latencies for Pub/Sub were still elevated, so at 21:54, engineers commenced restarting other Pub/Sub servers, restoring service to 90% of users. At 22:29 a final batch was restarted, restoring the Pub/Sub service to all.
@@ -1025,12 +1025,12 @@ To prevent a recurrence of the issue, Google engineers are creating safeguards t
 
 # [cloud/pubsub/19001](https://status.cloud.google.com/incident/cloud/pubsub/19001)
 13:13 May 28, 2019
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 On Monday 20 May, 2019, Google Cloud Pub/Sub experienced publish error rates of 1.2%, increased publish latency by 1.7ms at the 50th percentile, and 8.3s increase at the 99th percentile for a duration of 3 hours, 30 minutes. Publish and Subscribe admin operations saw average error rates of 8.3% and 3.2% respectively for the same period. We apologize to our customers who were impacted by this service degradation.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 On Monday 20 May, 2019 from 20:54 to Tuesday 21 May, 2019 00:24 US/Pacific Google Cloud Pub/Sub experienced publish error rates of 1.2%, increased publish latency by 1.7ms at the 50th percentile, and 8.3s increase at the 99th percentile for a duration of 3 hours, 30 minutes. Publish (CreateTopic, GetTopic, UpdateTopic, DeleteTopic) and Subscribe (CreateSnapshot, CreateSubscription, UpdateSubscription) admin operations saw average error rates of 8.3% and 3.2% respectively for the same period. Customers affected by the incident may have seen errors containing messages like âDEADLINE_EXCEEDEDâ.
 Cloud Pub/Subâs elevated error rates and increased latency indirectly impacted Cloud SQL, Cloud Filestore, and App Engine Task Queues globally. The incident caused elevated error rates in admin operations (including instance creation) for both Cloud SQL and Cloud Filestore, as well as increased latencies and timeout errors for App Engine Task Queues during the incident.
-## ROOT CAUSE
+## ROOT CAUSE:
 The incident was triggered by an internal user creating an unexpected surge of publish requests to Cloud Pub/Sub topics. These requests did not cache as expected and led to hotspotting on the underlying metadata storage system responsible for managing Cloud Pub/Subâs publish and subscribe operations. The hotspotting triggered overload protection mechanisms within the storage system which began to reject some incoming requests and delay the processing of others, both of which contributed to the elevated error rates and increased latencies experienced by Cloud Pub/Sub.
 REMEDIATION AND PREVENTION
 On Monday 20 May, 2019 at 21:16 US/Pacific Google engineers were automatically alerted to elevated error rates and immediately began their investigation. At 22:18, we determined the underlying storage system was responsible for the elevated error rates afflicting Cloud Pub/Sub and escalated the issue to the storage systemâs engineering team. At 22:48, Google engineers attempted to mitigate the issue by providing additional resources to the impacted storage system servers, however, this did not address the hotspots and error rates remained elevated. At 23:00, Google engineers disabled non-essential internal traffic to reduce load being sent to the storage system, this improved system behavior, but did not lead to a full recovery. On Tuesday 21 May, 2019 at 00:19 US/Pacific, Google engineers identified the source for the surge of requests and implemented a rate limit on the requests, which effectively mitigated the issue. Once the traffic had subsided, the storage systemâs automated mechanisms were able to successfully heal the service, leading to full resolution of the incident by 00:24.
@@ -1118,11 +1118,11 @@ We apologize for the inconvenience this issue caused our customers.
 
 # [cloud/sql/17017](https://status.cloud.google.com/incident/cloud/sql/17017)
 13:00 Aug 29, 2017
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 On Tuesday 15 August 2017, Google Cloud SQL experienced issues in the europe-west1 zones for a duration of 3 hours and 35 minutes. During this time, new connections from Google App Engine (GAE) or Cloud SQL Proxy would timeout and return an error. In addition, Cloud SQL connections with ephemeral certs that had been open for more than one hour timed out and returned an error. We apologize to our customers whose projects were affected â we are taking immediate action to improve the platformâs performance and availability.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 On Tuesday 15 August 2017 from 17:20 to 20:55 PDT, 43.1% of Cloud SQL instances located in europe-west1 were unable to be managed with the Google Cloud SQL Admin API to create or make changes. Customers who connected from GAE or used the Cloud SQL Proxy (which includes most connections from Google Container Engine) were denied new connections to their database.
-## ROOT CAUSE
+## ROOT CAUSE:
 The issue surfaced through a combination of a spike in error rates internal to the Cloud SQL service and a lack of available resources in the Cloud SQL control plane for europe-west1.
 By way of background, the Cloud SQL system uses a database to store metadata for customer instances.  This metadata is used for validating new connections. Validation will fail if the load on the database is heavy.
 In this case, Cloud SQLâs automatic retry logic overloaded the control plane and consumed all the available Cloud SQL control plane processing in europe-west1.  This in turn made the Cloud SQL Proxy and front end client server pairing reject connections when ACLs and certificate information stored in the Cloud SQL control plane could not be accessed.
@@ -1195,12 +1195,12 @@ Google engineers are eliminating the race condition in the rollout process, as w
 
 # [compute/15045](https://status.cloud.google.com/incident/compute/15045)
 16:10 Feb 19, 2015
-## SUMMARY
+## SUMMARY:
 For 40 minutes spanning Wednesday 18th and Thursday 19th February 2015, the majority of Google Compute Engine instances experienced traffic loss for outbound network connectivity, with lower levels of loss beginning at 22:40 PST on February 18th and ending at 01:20 PST on February 19th. The total length of detectable external traffic loss was 2 hours and 40 minutes. We consider GCEâs availability over the last 24 hours to be unacceptable, and we apologise if your service was affected by this outage. Today we are completely focused on addressing the incident and its root causes, so that this problem or other hypothetical similar problems cannot recur in the future.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 Starting at 18 February at 22:40 PST, outbound traffic from Google Compute Engine instances began to experience 10% loss of flows. The fraction of flows experiencing loss increased linearly to a peak of 70% loss at 23:55. That level of loss lasted 40 minutes until 00:35 PST on 19 February, at which point engineering remediation efforts rapidly reduced loss to 15% by 00:50. Traffic loss was eliminated and normal traffic levels resumed by 01:20.
 The issue manifested as a loss of external connectivity to the instances, and an inability of the instances to send traffic outside their private network. The instances themselves continued to run, and became available again as their external traffic loss cleared.
-## ROOT CAUSE [PRELIMINARY]
+ROOT CAUSE [PRELIMINARY]
 The internal software system which programs GCEâs virtual network for VM egress traffic stopped issuing updated routing information. The cause of this interruption is still under active investigation. Cached route information provided a defense in depth against missing updates, but GCE VM egress traffic started to be dropped as the cached routes expired.
 RESOLUTION AND PREVENTION
 Google Engineers were alerted to the dropped packets caused by cached route expiration. 
@@ -1316,7 +1316,7 @@ Although the issue was detected promptly, Google engineers have identified oppor
 22:00 Nov 04, 2015
 ## SUMMARY:
 Between Saturday 31 October 2015 and Sunday 1 November 2015, Google Compute Engine networking in the us-central1-b zone was impaired on 3 occasions for an aggregate total of 4 hours 10 minutes. We apologize if your service was affected in one of these incidents, and we are working to improve the platformâs performance and availability to meet our customerâs expectations.
-## DETAILED DESCRIPTION OF IMPACT (All times in Pacific/US):
+DETAILED DESCRIPTION OF IMPACT (All times in Pacific/US):
 Outage timeframes for Saturday 31 October 2015: 05:52 to 07:05 for 73 minutes
 Outage timeframes for Sunday 1 November 2015: 14:10 to 15:30 for 80 minutes, 19:03 to 22:40 for 97 minutes
 During the affected timeframes, up to 14% of the VMs in us-central1-b experienced up to 100% packet loss communicating with other VMs in the same project.  The issue impacted both in-zone and intra-zone communications.
@@ -1438,7 +1438,7 @@ Finally, to underscore how seriously we are taking this event, we are offering G
 ## DETAILED DESCRIPTION OF IMPACT:
 On Monday, 11 April, 2016 from 19:09 to 19:27 Pacific Time, inbound internet traffic to Compute Engine instances was not routed correctly, resulting in dropped connections and an inability to reconnect.  The loss of inbound traffic caused services depending on this network path to fail as well, including VPNs and L3 network load balancers. Additionally, the Cloud VPN offering in the asia-east1 region experienced the same traffic loss starting at an earlier time of 18:14 Pacific Time but the same end time of 19:27.
 This event did not affect Google App Engine, Google Cloud Storage, and other Google Cloud Platform products; it also did not affect internal connectivity between GCE services including VMs, HTTP and HTTPS (L7) load balancers, and outbound internet traffic.
-TIMELINE and ## ROOT CAUSE:
+TIMELINE and ROOT CAUSE:
 Google uses contiguous groups of internet addresses -- known as IP blocks -- for Google Compute Engine VMs, network load balancers, Cloud VPNs, and other services which need to communicate with users and systems outside of Google.  These IP blocks are announced to the rest of the internet via the industry-standard BGP protocol, and it is these announcements which allow systems outside of Googleâs network to âfindâ GCP services regardless of which network they are on.
 To maximize service performance, Googleâs networking systems announce the same IP blocks from several different locations in our network, so that users can take the shortest available path through the internet to reach their Google service.  This approach also enhances reliability; if a user is unable to reach one location announcing an IP block due to an internet failure between the user and Google, this approach will send the user to the next-closest point of announcement.  This is part of the internetâs fabled ability to âroute aroundâ problems, and it masks or avoids numerous localized outages every week as individual systems in the internet have temporary problems.
 At 14:50 Pacific Time on April 11th, our engineers removed an unused GCE IP block from our network configuration, and instructed Googleâs automated systems to propagate the new configuration across our network.  By itself, this sort of change was harmless and had been performed previously without incident.  However, on this occasion our network configuration management software detected an inconsistency in the newly supplied configuration.  The inconsistency was triggered by a timing quirk in the IP block removal - the IP block had been removed from one configuration file, but this change had not yet propagated to a second configuration file also used in network configuration management.  In attempting to resolve this inconsistency the network management software is designed to âfail safeâ and revert to its current configuration rather than proceeding with the new configuration.  However, in this instance a previously-unseen software bug was triggered, and instead of retaining the previous known good configuration, the management software instead removed all GCE IP blocks from the new configuration and began to push this new, incomplete configuration to the network.
@@ -1573,11 +1573,11 @@ We apologize again for the impact this issue caused our customers.
 
 # [compute/17003](https://status.cloud.google.com/incident/compute/17003)
 18:30 Feb 08, 2017
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 On Monday 30 January 2017, newly created Google Compute Engine instances, Cloud VPNs and network load balancers were unavailable for a duration of 2 hours 8 minutes. We understand how important the flexibility to launch new resources and scale up GCE is for our users and apologize for this incident. In particular, we apologize for the wide scope of this issue and are taking steps to address the scope and duration of this incident as well as the root cause itself.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 Any GCE instances, Cloud VPN tunnels or GCE network load balancers created or live migrated on Monday 30 January 2017 between 10:36 and 12:42 PDT were unavailable via their public IP addresses until the end of that period. This also prevented outbound traffic from affected instances and load balancing health checks from succeeding. Previously created VPN tunnels, load balancers and instances that did not experience a live migration were unaffected.
-## ROOT CAUSE
+## ROOT CAUSE:
 All inbound networking for GCE instances, load balancers and VPN tunnels enter via shared layer 2 load balancers. These load balancers are configured with changes to IP addresses for these resources, then automatically tested in a canary deployment, before changes are globally propagated.
 The issue was triggered by a large set of updates which were applied to a rarely used load balancing configuration. The application of updates to this configuration exposed an inefficient code path which resulted in the canary timing out. From this point all changes of public addressing were queued behind these changes that could not proceed past the testing phase.
 REMEDIATION AND PREVENTION
@@ -1588,13 +1588,13 @@ Google engineers are also creating additional metrics and alerting that will all
 
 # [compute/17007](https://status.cloud.google.com/incident/compute/17007)
 14:11 Apr 12, 2017
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 On Wednesday 5 April 2017, requests to the Google Cloud HTTP(S) Load Balancer experienced a 25% error rate for a duration of 22 minutes.
 We apologize for this incident. We understand that the Load Balancer needs to be very reliable for you to offer a high quality service to your customers. We have taken and will be taking various measures to prevent this type of incident from recurring.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 On Wednesday 5 April 2017 from 01:13 to 01:35 PDT, requests to the Google Cloud HTTP(S) Load Balancer experienced a 25% error rate for a duration of 22 minutes. Clients received 502 errors for failed requests. Some HTTP(S) Load Balancers that were recently modified experienced error rates of 100%.
 Google paused all configuration changes to the HTTP(S) Load Balancer for three hours and 41 minutes after the incident, until our engineers had understood the root cause. This caused deployments of App Engine Flexible apps to fail during that period.
-## ROOT CAUSE
+## ROOT CAUSE:
 A bug in the HTTP(S) Load Balancer configuration update process caused it to revert to a configuration that was substantially out of date.
 The configuration update process is controlled by a master server. In this case, one of the replicas of the master servers lost access to Google's distributed file system and was unable to read recent configuration files. Mastership then passed to the server that could not access Google's distributed file system. When the mastership changes, it begins the next configuration push as normal by testing on a subset of HTTP(S) Load Balancers. If this test succeeds, the configuration is pushed globally to all HTTP(S) Load Balancers.  If the test fails (as it did in this case), the new master will revert all HTTP(S) Load Balancers to the last "known good" configuration. The combination of a mastership change, lack of access to more recent updates, and the initial test failure for the latest config caused the HTTP(S) Load Balancers to revert to the latest configuration that the master could read, which was substantially out-of-date.
 In addition, the update with the out-of-date configuration triggered a garbage collection process on the Google Frontend servers to free up memory used by the deleted configurations. The high number of deleted configurations caused the Google Frontend servers to spend a large proportion of CPU cycles on garbage collection which lead to failed health checks and eventual restart of the affected Google Frontend server. Any client requests served by a restarting server received 502 errors.
@@ -1612,13 +1612,13 @@ Once again, we apologize for the impact that this incident had on your service.
 
 # [compute/17008](https://status.cloud.google.com/incident/compute/17008)
 07:17 Jun 17, 2017
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 On Thursday 8 June 2017, from 08:24 to 09:26 US/Pacific Time, datacenters in the asia-northeast1 region experienced a loss of network connectivity for a total of 62 minutes. We apologize for the impact this issue had on our customers, and especially to those customers with deployments across multiple zones in the asia-northeast1 region. We recognize we failed to deliver the regional reliability that multiple zones are meant to achieve.
 We recognize the severity of this incident and have completed an extensive internal postmortem.  We thoroughly understand the root causes and no datacenters are at risk of recurrence.  We are at work to add mechanisms to prevent and mitigate this class of problem in the future.  We have prioritized this work and in the coming weeks, our engineering team will complete the action items we have generated from the postmortem.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 On Thursday 8 June 2017, from 08:24 to 09:26 US/Pacific Time, network connectivity to and from Google Cloud services running in the asia-northeast1 region was unavailable for 62 minutes.  This issue affected all Google Cloud Platform services in that region, including Compute Engine, App Engine, Cloud SQL, Cloud Datastore, and Cloud Storage.  All external connectivity to the region was affected during this time frame, while internal connectivity within the region was not affected.
 In addition, inbound requests from external customers originating near Googleâs Tokyo point of presence intended for Compute or Container Engine HTTP Load Balancing were lost for the initial 12 minutes of the outage. Separately, Internal Load Balancing within asia-northeast1 remained degraded until 10:23.
-## ROOT CAUSE
+## ROOT CAUSE:
 At the time of incident, Google engineers were upgrading the network topology and capacity of the region; a configuration error caused the existing links to be decommissioned before the replacement links could provide connectivity, resulting in a loss of connectivity for the asia-northeast1 region. Although the replacement links were already commissioned and appeared to be ready to serve, a network-routing protocol misconfiguration meant that the routes through those links were not able to carry traffic.
 As Google's global network grows continuously, we make upgrades and updates reliably by using automation for each step and, where possible, applying changes to only one zone at any time.  The topology in asia-northeast1 was the last region unsupported by automation; manual work was required to be performed to align its topology with the rest of our regional deployments (which would, in turn, allow automation to function properly in the future). This manual change mistakenly did not follow the same per-zone restrictions as required by standard policy or automation, which meant the entire region was affected simultaneously.
 In addition, some customers with deployments across multiple regions that included asia-northeast1 experienced problems with HTTP Load Balancing due to a failure to detect that the backends were unhealthy. When a network partition occurs, HTTP Load Balancing normally detects this automatically within a few seconds and routes traffic to backends in other regions. In this instance, due to a performance feature being tested in this region at the time, the mechanism that usually detects network partitions did not trigger, and continued to attempt to assign traffic until our on-call engineers responded.  Lastly, the Internal Load Balancing outage was exacerbated due to a software defined networking component which was stuck in a state where it was not able to provide network resolution for instances in the load balancing group.
@@ -1629,19 +1629,19 @@ The fix for the HTTP Load Balancing performance feature that caused it to incorr
 SUPPORT COMMUNICATIONS
 During the incident, customers who had originally contacted Google Cloud Support in Japanese did not receive periodic updates from Google as the event unfolded. This was due to a software defect in the support tooling â unrelated to the incident described earlier.
 We have already fixed the software defect, so all customers who contact support will receive incident updates.  We apologize for the communications gap to our Japanese-language customers.
-RELIABILITY ## SUMMARY
+RELIABILITY SUMMARY
 One of our biggest pushes in GCP reliability at Google is a focus on careful isolation of zones from each other.  As we encourage users to build reliable services using multiple zones, we also treat zones separately in our production practices, and we enforce this isolation with software and policy.  Since we missed this markâand affecting all zones in a region is an especially serious outageâwe apologize.  We intend for this incident report to accurately summarize the detailed internal post-mortem that includes final assessment of impact, root cause, and steps we are taking to prevent an outage of this form occurring again.  We hope that this incident report demonstrates the work we do to learn from our mistakes to deliver on this commitment. We will do better.
 Sincerely,
 Benjamin Lutch | VP Site Reliability Engineering | Google
 
 # [compute/18012](https://status.cloud.google.com/incident/compute/18012)
 10:33 Nov 09, 2018
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 On Wednesday 5 November 2018, Google Compute Engine (GCE) experienced new instance creation failures or elevated instance creation latency in us-central1-a for a duration of 5 hours. We apologize to our customers whose services or businesses were impacted during this incident, and we are taking immediate steps to avoid a recurrence.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 50% of new Google Compute Engine (GCE) instances failed to or were slow to create in us-central1-a on Wednesday 5 November 2018 from 04:58 - 09:46 PST. This also affected Google Kubernetes Engine (GKE) cluster creation, and instances used by Google Cloud SQL, Google Cloud Dataproc, and Google Cloud Shell in the same region. Additionally, instances that were live migrated or had operations [1] that were mutated by gcloud or from the Cloud Console during this period may have gotten into a bad state. This would have manifested as an instance being stuck and not being restartable.
 [1] https://cloud.google.com/sdk/gcloud/reference/compute/operations/list
-## ROOT CAUSE
+## ROOT CAUSE:
 Googleâs datacenters rely on sharded Access Control Lists (ACL) stored in a highly available lock service called Chubby [1] to perform operations in the data plane. The root cause was a standard ACL update, when a job crashed mid-write, leaving the ACL stored in Chubby in a corrupted state. After an automatic restart, faulty recovery logic was triggered which prevented the corrupted ACL from being correctly re-written.This caused any operations that attempted to read the ACL to fail. As a result, the permissions of affected instances were not verifiable and the requested control plane operation eventually timed out, causing the instance creation failure, or crash-looping of instances that were being live migrated to other hosts.
 [1] https://ai.google/research/pubs/pub27897
 REMEDIATION AND PREVENTION
@@ -1681,7 +1681,7 @@ To ensure prompt detection of any similar issues in future, Google engineers are
 On Friday 8 May 2015, users were unable to reliably create projects in the Google Cloud Developers Console for 6 hours 58 minutes in aggregate.  We treat the reliability and availability of the Developers Console with the highest priority and we apologize to any users who were unable to create new projects during that time.
 ## DETAILED DESCRIPTION OF IMPACT:
 On Friday 8 May 2015, from 04:53 to 07:25 and from 09:35 to 12:31 PDT, users were unable to reliably create new projects using the Developers Console. Specifically, up to 90% of project creation requests failed and returned a "Backend Error" message to the user.  Existing projects were not affected by this incident.
-## ROOT CAUSE AND REMEDIATION:
+ROOT CAUSE AND REMEDIATION:
 A configuration change in the access management system of Developers Console triggered an existing software bug in a previously unused code path. As the change was rolled out, the access management system could no longer correctly verify userâs permissions, resulting in an error response.
 Google engineers were automatically alerted to the issue at 05:04. At 05:22 a preliminary source of the issue was identified. At 09:32 the root cause was confirmed and a solution was developed.  An expedited roll-out of the fix commenced at 11:41 and completed at 12:31.
 
@@ -1728,11 +1728,11 @@ We apologize again for the inconvenience this issue caused our customers.
 
 # [developers/console/19001](https://status.cloud.google.com/incident/developers/console/19001)
 16:55 Mar 14, 2019
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 On Monday, 11 March 2019, Google Cloud Console was unavailable for a duration of 3 hours and 54 minutes. Although, Google Cloud Platform resources remained unaffected, we understand that a majority of our customers rely on Cloud Console to manage their cloud resources and we sincerely apologize to everyone who was affected by the incident. The issue also affected Firebase console and IAM service account activations.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 On Monday, 11 March 2019, from 09:26 to 13:20 US/Pacific, Cloud Console was unavailable. Users were unable to access and manage their GCP resources using Cloud Console. All Google Cloud Platform resources continued to function and were accessible using the gcloud CLI, and the Cloud Console iOS and Android apps. From 14:10 to 15:37 US/Pacific, for a duration of 1 hour 27 minutes, Firebase Console and IAM service account activation were also unavailable to users.
-## ROOT CAUSE
+## ROOT CAUSE:
 Most Google services use a quota system for rate limiting user requests. The quota system implements a variant of the classic token bucket algorithm [1].
 The issue was triggered when a code change in the most recent release of the quota system introduced a bug, causing a fallback to significantly smaller, default quota limits,  resulting in user requests being denied.
 While the Cloud Console team mitigated the issue at 13:20 US/Pacifc, the underlying issue with the quota system started affecting Firebase Console and IAM service account activation beginning 14:10 US/Pacific until it was mitigated at 15:37 US/Pacific.
@@ -1744,11 +1744,11 @@ We apologize again for the inconvenience caused by this issue to our customers.
 
 # [developers/console/19003](https://status.cloud.google.com/incident/developers/console/19003)
 09:51 May 10, 2019
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 On Thursday 2 May 2019, Google Cloud Console experienced a 40% error rate for all pageviews over a duration of 1 hour and 53 minutes. To all customers affected by this Cloud Console service degradation, we apologize. We are taking immediate steps to improve the platformâs performance and availability.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 On Thursday 2 May 2019 from 07:10 to 09:03 US/Pacific the Google Cloud Console served 40% of all pageviews with a timeout error. Affected console sections include Compute Engine, Stackdriver, Kubernetes Engine, Cloud Storage, Firebase, App Engine, APIs, IAM, Cloud SQL, Dataflow, BigQuery and Billing.
-## ROOT CAUSE
+## ROOT CAUSE:
 The Google Cloud Console relies on many internal services to properly render individual user interface pages. The internal billing service is one of them, and is required to retrieve accurate state data for projects and accounts.
 At 07:09 US/Pacific, a service unrelated to the Cloud Console began to send a large amount of traffic to the internal billing service. The additional load caused time-out and failure of individual requests including those from Google Cloud Console. This led to the Cloud Console serving timeout errors to customers when the underlying requests to the billing service failed.
 REMEDIATION AND PREVENTION
@@ -1757,11 +1757,11 @@ In order to reduce the chance of recurrence we are taking the following actions.
 
 # [google/stackdriver/18007](https://status.cloud.google.com/incident/google/stackdriver/18007)
 13:03 May 24, 2018
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 On Sunday, 20 May 2018 for 4 hours and 25 minutes, approximately 6% of Stackdriver Logging logs experienced a median ingest latency of 90 minutes. To our Stackdriver Logging customers whose operations monitoring was impacted during this outage, we apologize. We have conducted an internal investigation and are taking steps to ensure this doesnât happen again.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 On Wednesday, 20 May 2018 from 18:40 to 23:05 Pacific Time, 6% of logs ingested by Stackdriver Logging experienced log event ingest latency of up to 2 hours 30 minutes, with a median latency of 90 minutes. Customers requesting log events within the latency window would receive empty responses. Logging export sinks were not affected.
-## ROOT CAUSE
+## ROOT CAUSE:
 Stackdriver Logging uses a pool of workers to persist ingested log events. On Wednesday, 20 May 2018 at 17:40, a load spike in the Stackdriver Logging storage subsystem caused 0.05% of persist calls made by the workers to time out. The workers would then retry persisting to the same address until reaching a retry timeout. While the workers were retrying, they were not persisting other log events. This resulted in multiple workers removed from the pool of available workers.
 By 18:40, enough workers had been removed from the pool to reduce throughput below the level of incoming traffic, creating delays for 6% of logs.
 REMEDIATION AND PREVENTION
@@ -1770,10 +1770,10 @@ We are taking the following steps to prevent the issue from happening again: we 
 
 # [google/stackdriver/19007](https://status.cloud.google.com/incident/google/stackdriver/19007)
 15:38 Sep 27, 2019
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 On Tuesday 24 September, 2019, the following Google Cloud Platform services were partially impacted by an overload condition in an internal publish/subscribe messaging system which is a dependency of these products: App Engine, Compute Engine, Kubernetes Engine, Cloud Build, Cloud Composer, Cloud Dataflow, Cloud Dataproc, Cloud Firestore, Cloud Functions, Cloud DNS, Cloud Run, and Stackdriver Logging & Monitoring. Impact was limited to administrative operations for a number of these products, with existing workloads and instances not affected in most cases.
 We apologize to those customers whose services were impacted during this incident; we are taking immediate steps to improve the platformâs performance and availability.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 On Tuesday 24 September, 2019 from 12:46 to 20:00 US/Pacific, Google Cloud Platform experienced a partial disruption to multiple services with their respective impacts detailed below:
 App Engine
 Google App Engine (GAE) create, update, and delete admin operations failed globally from 12:57 to 18:21 for a duration of 5 hours and 24 minutes. Affected customers may have seen error messages like âAPP_ERRORâ. Existing GAE workloads were unaffected.
@@ -1799,7 +1799,7 @@ Cloud Firestore
 Cloud Firestore API was unable to be enabled (if not previously enabled) globally from 13:36 to 17:50 for a duration of 4 hours and 14 minutes.
 Cloud Run
 Cloud Run new deployments failed in the us-central1 region from 12:48 to 16:35 for a duration of 3 hours and 53 minutes. Existing Cloud Run workloads, and deployments in other regions were unaffected.
-## ROOT CAUSE
+## ROOT CAUSE:
 Google runs an internal publish/subscribe messaging system, which many services use to propagate state for control plane operations. That system is built using a replicated, high-availability key-value store, holding information about current lists of publishers, subscribers and topics, which all clients of the system need access to.
 The outage was triggered when a routine software rollout of the key-value store in a single region restarted one of its tasks. Soon after, a network partition isolated other tasks, transferring load to a small number of replicas of the key-value store. As a defense-in-depth, clients of the key-value store are designed to continue working from existing, cached data when it is unavailable; unfortunately, an issue in a large number of clients caused them to fail and attempt to resynchronize state. The smaller number of key-value store replicas were unable to sustain the load of clients synchronizing state, causing those replicas to fail. The continued failures moved load around the available replicas of the key-value store, resulting in a degraded state of the interconnected components.
 The failure of the key-value store, combined with the issue in the key-value store client, meant that publishers and subscribers in the impacted region were unable to correctly send and receive messages, causing the documented impact on dependent services.
@@ -1919,13 +1919,13 @@ Changing RPC queuing behavior in GCS to provide more capacity and more graceful 
 
 # [storage/16029](https://status.cloud.google.com/incident/storage/16029)
 15:30 Aug 28, 2015
-## SUMMARY
+## SUMMARY:
 On Wednesday 26 August 2015, requests to Signed URLs [1] on Google Cloud Storage (GCS) returned errors for an extended period of time, affecting approximately 18% of projects using the Signed URLs feature. We apologize to our customers who were affected by this issue. We have identified and fixed the root causes of the incident, and we are putting measures in place to keep similar issues from occurring in future.
 [1] https://cloud.google.com/storage/docs/access-control#Signed-URLs
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 On Wednesday August 26th 2015 at 07:26 PDT, approximately 18% of projects sending requests to GCS Signed URLs started receiving HTTP 500 and 503 responses. The majority of the errors occurred from 07:25 to 10:34 PDT. From 10:34 the number of affected projects decreased, and by 11:25 PDT fewer than 2% of Signed URL requests were receiving errors. A small number of projects encountered continued errors until remediation was completed at 20:38.
 There was no disruption to any GCS functionality that did not involve Signed URLs.
-## ROOT CAUSE
+## ROOT CAUSE:
 GCS Signed URLs are cryptographically signed by the owner of the stored data, using the private key of a Google Cloud Platform service account. The private key is known only to the owner, but the corresponding public key is retained by Google and used to verify the URL signatures.
 Within Google, similar service accounts are used for many internal authentication purposes. (For example, these accounts include the default service account which internally represents the customer's Cloud Platform project.) For these service accounts, Google retains both the public and the private key. These keypairs have a short lifetime and are frequently regenerated.
 All keys are managed in a central, strongly hardened security module. As part of an effort to simplify the key management system, prior to the incident, a configuration change was pushed which mistakenly caused the security module to consider customers' service accounts as candidates for automatic keypair management. This change was later rolled back, removing the service accounts from automatic management, but some customers' service accounts had already received new keypairs with finite lifetimes. Accounts with heavy Signed URL usage were more likely to be affected.
@@ -1939,11 +1939,11 @@ In case of other future issues with the security module, Google engineers are st
 
 # [storage/17002](https://status.cloud.google.com/incident/storage/17002)
 14:27 Jul 14, 2017
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 On Thursday, 6 July 2017, requests to Google Cloud Storage (GCS) JSON API experienced elevated error rates for a period of 3 hours and 15 minutes. The GCS XML API was not affected.
 Requests to www.googleapis.com that used OAuth2 credentials experienced elevated error rates for 29 minutes, which directly caused higher failure rates for other products, including Firebase and Google Cloud Functions.
 If your service or applicationâs was affected by this issue, we sincerely apologize. We understand the importance of reliable APIs and are currently taking steps to prevent future recurrences of this issue.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 Starting on Thursday, 6 July 2017 at 15:15 PDT and continuing for 60 minutes, requests to the GCS JSON API experienced elevated error rates that peaked at 40%. At 16:15 error rates returned to normal. Then from 16:51 to 18:30, the JSON API request error rate peaked at a 97%.
 Requests to www.googleapis.com that used OAuth2 credentials experienced an 82% error rate from 15:35 to 16:04, which many services rely on for tokens, userinfo and token information.
 Firebase Hosting and Functions was impacted from 15:15 to 18:30, during which deployment error rates reached a 99% failure rate due to a joint dependence on GCS uploads and OAuth2.
@@ -1951,7 +1951,7 @@ Google Cloud Functions (GCF) deployments experienced a 1.2% failure rate when at
 Other services that rely on Google APIs experienced <1% error rates.
 Most HTTP responses returned to customers were of type â503 Service Unavailable.â
 The issue was resolved at 18:31 when normal service was restored.
-## ROOT CAUSE
+## ROOT CAUSE:
 A low-level software defect in an internal API service that handles GCS JSON requests caused infrequent memory-related process terminations. These process terminations increased as a result of a large volume in requests to the GCS Transfer Service, which uses the same internal API service as the GCS JSON API. This caused an increased rate of 503 responses for GCS JSON API requests for 3.25 hours.
 While attempting to fix the latency, the traffic for GCS JSON requests was isolated from other API traffic. 
 After the traffic was isolated, attempts to mitigate the problem caused the error rate to increase to 97%.  The problem was finally fixed when a further configuration change fixed the process terminations.
@@ -1962,12 +1962,12 @@ We apologize for the impact that this incident had on your services, deployments
 
 # [storage/17005](https://status.cloud.google.com/incident/storage/17005)
 12:49 Oct 19, 2017
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 Starting Thursday 12 October 2017, Google Cloud Storage clients located in the Northeast of North America experienced up to a 10% error rate for a duration of 21 hours and 35 minutes when fetching objects stored in multi-regional buckets in the US.
 We apologize for the impact of this incident on your application or service. The reliability of our service is a top priority and we understand that we need to do better to ensure that incidents of this type do not recur.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 Between Thursday 12 October 2017 12:47 PDT and Friday 13 October 2017 10:12 PDT, Google Cloud Storage clients located in the Northeast of North America experienced up to a 10% rate of 503 errors and elevated latency. Some users experienced higher error rates for brief periods. This incident only impacted requests to fetch objects stored in multi-regional buckets in the US; clients were able to mitigate impact by retrying. The percentage of total global requests to Cloud Storage that experienced errors was 0.03%.
-## ROOT CAUSE
+## ROOT CAUSE:
 Google ensures balanced use of its internal networks by throttling outbound traffic at the source host in the event of congestion. This incident was caused by a bug in an earlier version of the job that reads Cloud Storage objects from disk and streams data to clients. Under high traffic conditions, the bug caused these jobs to incorrectly throttle outbound network traffic even though the network was not congested.
 Google had previously identified this bug and was in the process of rolling out a fix to all Google datacenters. At the time of the incident, Cloud Storage jobs in a datacenter in Northeast North America that serves requests to some Canadian and US clients had not yet received the fix. This datacenter is not a location for customer buckets (https://cloud.google.com/storage/docs/bucket-locations), but objects in multi-regional buckets can be served from instances running in this datacenter in order to optimize latency for clients.
 REMEDIATION AND PREVENTION
@@ -1976,11 +1976,11 @@ We have now rolled out the bug fix to all regions. We will also add external mon
 
 # [storage/18003](https://status.cloud.google.com/incident/storage/18003)
 20:00 Sep 07, 2018
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 On Tuesday 4 September 2018, Google Cloud Storage experienced 1.1% error rates and increased 99th percentile latency for US multiregion buckets for a duration of 5 hours 38 minutes. After that time some customers experienced 0.1% error rates which returned to normal progressively over the subsequent 4 hours. To our Google Cloud Storage customers whose businesses were impacted during this incident, we sincerely apologize; this is not the level of tail-end latency and reliability we strive to offer you. We are taking immediate steps to improve the platformâs performance and availability.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 On Tuesday 4 September 2018 from 02:55 to 08:33 PDT, customers with buckets located in the US multiregion experienced a 1.066% error rate and 4.9x increased 99th percentile latency, with the peak effect occurring between 05:00 PDT and 07:30 PDT for write-heavy workloads. At 08:33 PDT 99th percentile latency decreased to 1.4x normal levels and error rates decreased, initially to 0.146% and then subsequently to nominal levels by 12:50 PDT.
-## ROOT CAUSE
+## ROOT CAUSE:
 At the beginning of August, Google Cloud Storage deployed a new feature which among other things prefetched and cached the location of some internal metadata. On Monday 3rd September 18:45 PDT, a change in the underlying metadata storage system resulted in increased load to that subsystem, which eventually invalidated some cached metadata for US multiregion buckets. This meant that requests for that metadata experienced increased latency, or returned an error if the backend RPC timed out. This additional load on metadata lookups led to elevated error rates and latency as described above.
 REMEDIATION AND PREVENTION
 Google Cloud Storage SREs were alerted automatically once error rates had risen materially above nominal levels. Additional SRE teams were involved as soon as the metadata storage system was identified as a likely root cause of the incident. In order to mitigate the incident, the keyspace that was suffering degraded performance needed to be identified and isolated so that it could be given additional resources. This work completed by the 4th September 08:33 PDT. In parallel, Google Cloud Storage SREs pursued the source of additional load on the metadata storage system and traced it to cache invalidations.
@@ -1988,13 +1988,13 @@ In order to prevent this type of incident from occurring again in the future, we
 
 # [storage/18005](https://status.cloud.google.com/incident/storage/18005)
 09:53 Dec 28, 2018
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 On Friday 21 December 2018, customers deploying App Engine apps, deploying in Cloud Functions, reading from Google Cloud Storage (GCS), or using Cloud Build experienced increased latency and elevated error rates ranging from 1.6% to 18% for a period of 3 hours, 41 minutes.
 We understand that these services are critical to our customers and sincerely apologize for the disruption caused by this incident; this is not the level of quality and reliability that we strive to offer you. We have several engineering efforts now under way to prevent a recurrence of this sort of problem; they are described in detail below.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 On Friday 21 December 2018, from 08:01 to 11:43 PST, Google Cloud Storage reads, App Engine deployments, Cloud Functions deployments, and Cloud Build experienced a disruption due to increased latency and 5xx errors while reading from Google Cloud Storage. The peak error rate for GCS reads was 1.6% in US multi-region. Writes were not impacted, as the impacted metadata store is not utilized on writes.
 Elevated deployment errors for App Engine Apps in all regions averaged 8% during the incident period. In Cloud Build, a 14% INTERNAL_ERROR rate and 18% TIMEOUT error rate occurred at peak. The aggregated average deployment failure rate of 4.6% for Cloud Functions occurred in us-central1, us-east1, europe-west1, and asia-northeast1.
-## ROOT CAUSE
+## ROOT CAUSE:
 Impact began when increased load on one of GCS's metadata stores resulted in request queuing, which in turn created an uneven distribution of service load.
 The additional load was created by a partially-deployed new feature. A routine maintenance operation in combination with this new feature resulted in an unexpected increase in the load on the metadata store. This increase in load affected read workloads due to increased request latency to the metadata store.
 In some cases, this latency exceeded the timeout threshold, causing an average of 0.6% of requests to fail in the US multi-region for the duration of the incident.
@@ -2004,20 +2004,20 @@ In addition to updating the impacting feature to prevent this type of increased 
 
 # [storage/19001](https://status.cloud.google.com/incident/storage/19001)
 06:43 Feb 21, 2019
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 Google Cloud Storage experienced elevated error rates averaging 10% across the European multi-region for GET, PUT, and DELETE requests. Google Engineering fully mitigated this incident at 10:17 on Feb 5, 2019.  We will conduct an internal investigation of this issue and make appropriate improvements to our systems to help prevent or minimize future recurrence.
 
 # [storage/19002](https://status.cloud.google.com/incident/storage/19002)
 11:09 Mar 14, 2019
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 On Tuesday 12 March 2019, Google's internal blob storage service experienced a service disruption for a duration of 4 hours and 10 minutes. We apologize to customers whose service or application was impacted by this incident. We know that our customers depend on Google Cloud Platform services and we are taking immediate steps to improve our availability and prevent outages of this type from recurring.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 On Tuesday 12 March 2019 from 18:40 to 22:50 PDT, Google's internal blob (large data object) storage service experienced elevated error rates, averaging 20% error rates with a short peak of 31% errors during the incident. User-visible Google services including Gmail, Photos, and Google Drive, which make use of the blob storage service also saw elevated error rates, although (as was the case with GCS) the user impact was greatly reduced by caching and redundancy built into those services. There will be a separate incident report for non-GCP services affected by this incident.
 The Google Cloud Platform services that experienced the most significant customer impact were the following:
 Google Cloud Storage experienced elevated long tail latency and an average error rate of 4.8%. All bucket locations and storage classes were impacted. GCP services that depend on Cloud Storage were also impacted.
 Stackdriver Monitoring experienced up to 5% errors retrieving historical time series data. Recent time series data was available. Alerting was not impacted.
 App Engine's Blobstore API experienced elevated latency and an error rate that peaked at 21% for fetching blob data. App Engine deployments experienced elevated errors that peaked at 90%. Serving of static files from App Engine also experienced elevated errors.
-## ROOT CAUSE
+## ROOT CAUSE:
 On Monday 11 March 2019, Google SREs were alerted to a significant increase in storage resources for metadata used by the internal blob service. On Tuesday 12 March, to reduce resource usage, SREs made a configuration change which had a side effect of overloading a key part of the system for looking up the location of blob data. The increased load eventually lead to a cascading failure.
 REMEDIATION AND PREVENTION
 SREs were alerted to the service disruption at 18:56 PDT and immediately stopped the job that was making configuration changes. In order to recover from the cascading failure, SREs manually reduced traffic levels to the blob service to allow tasks to start up without crashing due to high load.
@@ -2025,11 +2025,11 @@ In order to prevent service disruptions of this type, we will be improving the i
 
 # [support/19002](https://status.cloud.google.com/incident/support/19002)
 14:55 May 31, 2019
-ISSUE ## SUMMARY
+## ISSUE SUMMARY:
 On Friday 17 May, 2019, Google Cloud Support experienced case creation and read issues for a duration of 4 hours. We sincerely apologize to our customers for the difficulties and delays in communicating with Google Cloud Support during this time.
-## DETAILED DESCRIPTION OF IMPACT
+## DETAILED DESCRIPTION OF IMPACT:
 On Friday 17 May, 2019 from 10:08 to 14:07 US/Pacific, both Google Cloud Support and our customers were unable to view, create, and modify Support cases, utilize Chat Support, or view known issues via the Google Cloud Support Center (GCSC) and the Cloud Console. Phone support was also unavailable from 10:08 to 14:26.
-## ROOT CAUSE
+## ROOT CAUSE:
 A critical external dependency for Google Cloud Support encountered an issue resulting in service unavailability, which impacted both Googleâs and Google Cloud Platform customersâ ability to use the service. This impacted case creation for chat, phone, and email cases, which all rely on the external dependency to reference customer data and route to the correct channel. Unfortunately, our tooling also did not allow for an automated mitigation.
 REMEDIATION AND PREVENTION
 Googleâs engineers were alerted to the problem at 10:26 and escalated immediately. Once the nature and scope of the situation became clear, Cloud Support identified customer communication options through secondary channels. Customers were able to file cases through the backup âContact Supportâ mechanism that was automatically available in the Google Cloud Support Center (GCSC). All cases reported through the backup mechanism were routed internally to the appropriate Support Engineers.
